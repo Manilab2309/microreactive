@@ -4,21 +4,21 @@ import com.rx.reactive.entity.Stage;
 import com.rx.reactive.service.SimpleNumbersService;
 import com.rx.reactive.service.StageService;
 import io.micrometer.core.annotation.Timed;
-import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import com.rx.reactive.subscribers.SubscriberNumberOperations;
 
 import java.time.Duration;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api")
-
 @Timed
 public class PublisherController {
 
@@ -26,7 +26,13 @@ public class PublisherController {
     private SimpleNumbersService numbersService;
 
     @Autowired
+    private StageService stageService;
+
+    @Autowired
     private MeterRegistry meterRegistry;
+
+    @Autowired
+    private Stage stage = new Stage();
 
     @GetMapping("/hello")
     public String health() {
@@ -48,6 +54,41 @@ public class PublisherController {
         //flux.subscribe(SubscriberNumberOperations::plusOne);
 
         return flux;
+    }
+
+    @RequestMapping(path = "/updateSalary", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String updateSalary(@RequestBody  Map<String, Object> payload){
+
+        // LLamada de postman que pide actualizar la nomina, ejemplo
+        //{
+        //    "newSalary": "2000"
+        //}
+        JSONObject jsonObject = new JSONObject(payload);
+        try {
+            stageService.updateSalary(Integer.parseInt((String)jsonObject.get("newSalary")));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return "{\"response\":\"SALARY UPDATED\"}";
+    }
+
+    @RequestMapping(path = "/updateExpenses", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody String updateExpenses(@RequestBody  Map<String, Object> payload){
+
+        // LLamada de postman que pide actualizar la nomina, ejemplo
+        //{
+        //    "newExpenses": "500"
+        //}
+
+        JSONObject jsonObject = new JSONObject(payload);
+        try {
+            stageService.updateExpenses(Integer.parseInt((String)jsonObject.get("newExpenses")));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return "{\"response\":\"EXPENSES UPDATED\"}";
     }
 
     @GetMapping(path = "/filtered", produces= "text/event-stream")

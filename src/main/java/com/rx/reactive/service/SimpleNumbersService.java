@@ -21,8 +21,8 @@ public class SimpleNumbersService {
     public SimpleNumbersService(MeterRegistry meterRegistry) {
 
         // Counters setup initialization
-        pairNumberCounter = meterRegistry.counter("numbers.pairs"); // 1 - create a counter
-        oddNumberCounter = meterRegistry.counter("numbers.odds"); // 1 - create a counter
+        pairNumberCounter = meterRegistry.counter("microreactive.numbers.pairs"); // 1 - create a counter
+        oddNumberCounter = meterRegistry.counter("microreactive.numbers.odds"); // 1 - create a counter
 
         // Con close () provocas el reinicio de los contadores al reiniciar el micro
         pairNumberCounter.close();
